@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+  <body style="margin-top:250px;background-color:orange;">
+    <center>
+        <h1>APPLICATION CGI</h1>
+          <% require 'pg' %>
+          <% connection = PG::connect(dbname: "goya") %>
+          <% connection.internal_encoding = "UTF-8" %>
+        
+        <% result = connection.exec("select * from crops where give_for != 'Autoconsommation';") %>
+      <% data = [] %>
+      <% result.each do |record| %>
+      <%  data << "<tr><td>#{record["length"]}</td><td>#{record["weight"]}</td><td>#{record["quality"]}</td><td>#{record["give_for"]}</td><td>#{record["date"]}</td></tr>" %>
+    <% end %>
+    
+    <form action="content.cgi" method="POST">
+       Appuyer le bouton "Afficher" pour afficher les informations de goya bien que le cessionnaire ne soit pas autoconsommé.<br><br>
+       <!-- Substitute the data you want to send for value -->
+       <!-- Use name = "goya" as a marker for information -->
+      <input type="hidden" name="goya" value="<%= data.join('') %>">
+      <input type="submit" name="Afficher" >
+    </form>
+<br><br>
+    <% resul = connection.exec("select * from crops where quality = 'f';") %>
+      <% datat = [] %>
+      <% resul.each do |record| %>
+      <%  datat << "<tr><td>#{record["length"]}</td><td>#{record["weight"]}</td><td>#{record["quality"]}</td><td>#{record["give_for"]}</td><td>#{record["date"]}</td></tr>" %>
+    <% end %>
+    
+    <form action="content.cgi" method="POST">
+       Appuyer le bouton "Afficher" pour afficher les informations de goya de qualité mauvaise<br><br>
+       <!-- Substitute the data you want to send for value -->
+       <!-- Use name = "goya" as a marker for information -->
+      <input type="hidden" name="goya" value="<%= datat.join('') %>">
+      <input type="submit" name="Afficher" >
+    </form>
+    
+    </center>
+  </body>
+</html>
